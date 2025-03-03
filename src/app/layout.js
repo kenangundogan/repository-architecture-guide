@@ -23,6 +23,8 @@ export default function RootLayout({ children }) {
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 {children}
+                <div className="bg-gray-100 bg-yellow-100 bg-orange-100 bg-red-100 bg-green-100 bg-blue-100 bg-purple-100 hidden"></div>
+                <div className="text-gray-800 text-yellow-800 text-orange-800 text-red-800 text-green-800 text-blue-800 text-purple-800 hidden"></div>
             </body>
         </html>
     );
