@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { BeakerIcon, RectangleGroupIcon, DocumentIcon, ArchiveBoxIcon, FolderIcon } from '@heroicons/react/24/outline'
+import { ChevronRightIcon, ChevronDownIcon, DocumentIcon, FolderIcon } from '@heroicons/react/24/outline';
 
 export default function GroupList() {
     const [groups, setGroups] = useState([]);
@@ -16,23 +16,25 @@ export default function GroupList() {
             <h1 className="text-2xl font-bold mb-4">Repository Architecture Guide (RAG)</h1>
             <div className="grid gap-2">
                 {groups.map((group) => (
-                    <GroupItem key={group.id} group={group} parentName={null} />
+                    <GroupItem key={group.id} group={group} parentPath={[]} />
                 ))}
             </div>
         </div>
     );
 }
 
-function GroupItem({ group, parentName }) {
-    const [isOpen, setIsOpen] = useState(false); // Grup açık/kapalı kontrolü
-    const formattedGroupName = group.name.toLowerCase().replace(/ /g, "-"); // Grup adını formatla
+function GroupItem({ group, parentPath }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Mevcut grubu path'e ekleyerek tam hiyerarşiyi oluştur
+    const currentPath = [...parentPath, group.name.toLowerCase().replace(/ /g, "-")].join(" / ");
 
     return (
         <div>
             {/* Grup Başlığı */}
             <div className="group relative bg-white p-6 flex items-center justify-between rounded-xs cursor-pointer hover:bg-gray-50" onClick={() => setIsOpen(!isOpen)}>
-                <button className={`absolute -left-2 bg-white rounded-full w-6 h-6 text-black text-[10px] group-hover:bg-gray-50 ${isOpen ? "" : "▶"}`}>
-                    {isOpen ? "▼" : "▶"}
+                <button className="absolute -left-3 bg-white border-2 border-gray-100 rounded-full w-6 h-6 flex items-center justify-center text-black text-[10px] group-hover:bg-gray-50">
+                    {isOpen ? <ChevronDownIcon className="size-3" /> : <ChevronRightIcon className="size-3" />}
                 </button>
                 <div className="flex items-center gap-3">
                     <FolderIcon className="size-4" />
@@ -42,9 +44,7 @@ function GroupItem({ group, parentName }) {
                     <div>
                         <h2 className="text-md font-semibold">{group.name}</h2>
                         <p className="text-xs text-gray-500">{group.description}</p>
-                        <div className="text-xs text-gray-400">
-                            {parentName ? `${parentName.toLowerCase().replace(/ /g, "-")} / ${formattedGroupName}` : formattedGroupName}
-                        </div>
+                        <div className="text-xs text-gray-400">{currentPath}</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-600">
@@ -67,7 +67,7 @@ function GroupItem({ group, parentName }) {
                     {group.groups.length > 0 && (
                         <div className="grid gap-2">
                             {group.groups.map((subgroup) => (
-                                <GroupItem key={subgroup.id} group={subgroup} parentName={formattedGroupName} />
+                                <GroupItem key={subgroup.id} group={subgroup} parentPath={[...parentPath, group.name.toLowerCase().replace(/ /g, "-")]} />
                             ))}
                         </div>
                     )}
@@ -77,7 +77,9 @@ function GroupItem({ group, parentName }) {
                         <div className="mt-3">
                             <ul className="grid gap-1">
                                 {group.projects.map((project) => {
-                                    const formattedProjectName = project.name.toLowerCase().replace(/ /g, "-"); // Proje adını formatla
+                                    const formattedProjectName = project.name.toLowerCase().replace(/ /g, "-");
+                                    const projectPath = [...parentPath, group.name.toLowerCase().replace(/ /g, "-"), formattedProjectName].join(" / ");
+
                                     return (
                                         <li key={project.id} className="bg-white p-4 flex items-center justify-between rounded-xs text-gray-700">
                                             <div className="flex items-start space-x-4">
@@ -92,9 +94,7 @@ function GroupItem({ group, parentName }) {
                                                 <div className="grid gap-0.5">
                                                     <h3 className="text-md font-semibold">{project.name}</h3>
                                                     <p className="text-xs text-gray-500">{project.description}</p>
-                                                    <div className="text-xs text-gray-400">
-                                                        {parentName ? `${parentName.toLowerCase().replace(/ /g, "-")} / ${formattedProjectName}` : formattedProjectName}
-                                                    </div>
+                                                    <div className="text-xs text-gray-400">{projectPath}</div>
                                                     <div>
                                                         <span className={`inline-block px-3 py-1 text-xs rounded-full bg-gray-100 ${project.status === "active" ? "bg-gray-100 text-gray-800" : "bg-yellow-100 text-yellow-800"}`}>
                                                             {project.status}
